@@ -13,6 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
+/*Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
-});
+});*/
+Route::get('messages/archive', 'MessageController@archive');
+Route::get('messages/{id}/read', 'MessageController@read');
+Route::get('messages/{id}/archive', 'MessageController@archived');
+Route::resource('messages', 'MessageController', [
+	'only' => ['index', 'show'],
+]);
