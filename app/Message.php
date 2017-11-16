@@ -14,4 +14,6 @@ class Message extends Model
     	'message',
     	'time_sent',
     ];
+
+    public $timestamps = false;
 }

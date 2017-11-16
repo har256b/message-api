@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Message;
+use App\Repositories\EloquentMessageRepository as MessageRepository;
 use App\Http\Resources\Message as MessageResource;
 use App\Http\Resources\MessageCollection as MessageCollection;
 use Illuminate\Http\Request;
@@ -11,6 +12,21 @@ use Illuminate\Http\JsonResponse;
 class MessageController extends Controller
 {
     /**
+     * @var MessageRepository $messageRepository
+     */
+    private $messageRepository;
+
+    /**
+     * Constructor
+     *
+     * @param MessageRepository $messageRepository
+     */
+    public function __construct(MessageRepository $messageRepository)
+    {
+        $this->messageRepository = $messageRepository;
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @param Request $request
@@ -18,7 +34,14 @@ class MessageController extends Controller
      */
     public function index(Request $request)
     {
-        return $this->sendSuccessResponse(new MessageCollection(Message::paginate(3)));
+        // // Adding pagination criteria
+        $criteria = $request->only(['page', 'per_page']);
+        if (!array_key_exists('per_page', $criteria)) {
+            $criteria['per_page'] = env('PAGE_LIMIT');
+        }
+        $messages = $this->messageRepository->findBy([]);
+
+        return $this->sendSuccessResponse(new MessageCollection($messages));
     }
 
     /**
@@ -28,7 +51,17 @@ class MessageController extends Controller
      */
     public function archive(Request $request)
     {
-        return $this->sendSuccessResponse(new MessageCollection(Message::where('is_archived', true)->paginate(3)));
+        // // Adding pagination criteria
+        $criteria = $request->only(['page', 'per_page']);
+        if (!array_key_exists('per_page', $criteria)) {
+            $criteria['per_page'] = env('PAGE_LIMIT');
+        }
+
+        // Archived messages criteria
+        $criteria['is_archived'] = true;
+        $messages = $this->messageRepository->findBy($criteria);
+
+        return $this->sendSuccessResponse(new MessageCollection($messages));
     }
 
     /**
@@ -39,7 +72,15 @@ class MessageController extends Controller
      */
     public function show($id)
     {
-        return $this->sendSuccessResponse(new MessageResource(Message::find($id)));
+        // Find message by given ID
+        $message = $this->messageRepository->findOne($id);
+
+        // If $message is not avalid Message object i.e. null for invalid ID
+        if (!$message instanceof Message) {
+            return $this->sendNotFoundResponse("Message with id {$id} doesn't exist");
+        }
+
+        return $this->sendSuccessResponse(new MessageResource($message));
     }
 
     /**
@@ -50,7 +91,21 @@ class MessageController extends Controller
      */
     public function read(Request $request, $id)
     {
-        return $this->sendSuccessResponse(new MessageResource(Message::find($id)));
+        // Find message by given ID
+        $message = $this->messageRepository->findOne($id);
+
+        // If $message is not avalid Message object i.e. null for invalid ID
+        if (!$message instanceof Message) {
+            return $this->sendNotFoundResponse("Message with id {$id} doesn't exist.");
+        }
+
+        // Updating message to set as read
+        $message = $this->messageRepository->update($message, [
+            'is_read' => true,
+            'time_read' => time(),
+        ]);
+
+        return $this->sendSuccessResponse(new MessageResource($message));
     }
 
     /**
@@ -61,6 +116,20 @@ class MessageController extends Controller
      */
     public function archived(Request $request, $id)
     {
-        return $this->sendSuccessResponse(new MessageResource(Message::find($id)));
+        // Find message by given ID
+        $message = $this->messageRepository->findOne($id);
+
+        // If $message is not avalid Message object i.e. null for invalid ID
+        if (!$message instanceof Message) {
+            return $this->sendNotFoundResponse("Message with id {$id} doesn't exist.");
+        }
+
+        // Updating message to set as read
+        $message = $this->messageRepository->update($message, [
+            'is_archived' => true,
+            'time_archived' => time(),
+        ]);
+
+        return $this->sendSuccessResponse(new MessageResource($message));
     }
 }
