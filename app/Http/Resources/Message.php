@@ -19,8 +19,11 @@ class Message extends Resource
             'subject' => $this->subject,
             'sender' => $this->sender,
             'message' => $this->message,
+            'sent_at' => date('d.m.Y H:i:s', $this->time_sent),
             'read' => (boolean) $this->is_read,
+            'read_at' => ($this->time_read === null) ? null : date('d.m.Y H:i:s', $this->time_read),
             'archived' => (boolean) $this->is_archived,
+            'archived_at' => ($this->time_archived === null) ? null : date('d.m.Y H:i:s', $this->time_archived),
         ];
     }
 }
