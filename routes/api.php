@@ -17,8 +17,8 @@ use Illuminate\Http\Request;
     return $request->user();
 });*/
 Route::get('messages/archive', 'MessageController@archive');
-Route::get('messages/{id}/read', 'MessageController@read');
-Route::get('messages/{id}/archive', 'MessageController@archived');
+Route::post('messages/{id}/read', 'MessageController@read');
+Route::post('messages/{id}/archive', 'MessageController@archived');
 Route::resource('messages', 'MessageController', [
 	'only' => ['index', 'show'],
 ]);
