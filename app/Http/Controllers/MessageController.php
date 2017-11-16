@@ -34,12 +34,10 @@ class MessageController extends Controller
      */
     public function index(Request $request)
     {
-        // // Adding pagination criteria
+        // Adding pagination criteria from request
         $criteria = $request->only(['page', 'per_page']);
-        if (!array_key_exists('per_page', $criteria)) {
-            $criteria['per_page'] = env('PAGE_LIMIT');
-        }
-        $messages = $this->messageRepository->findBy([]);
+
+        $messages = $this->messageRepository->findBy($criteria);
 
         return $this->sendSuccessResponse(new MessageCollection($messages));
     }
@@ -51,11 +49,8 @@ class MessageController extends Controller
      */
     public function archive(Request $request)
     {
-        // // Adding pagination criteria
+        // // Adding pagination criteria from request
         $criteria = $request->only(['page', 'per_page']);
-        if (!array_key_exists('per_page', $criteria)) {
-            $criteria['per_page'] = env('PAGE_LIMIT');
-        }
 
         // Archived messages criteria
         $criteria['is_archived'] = true;
