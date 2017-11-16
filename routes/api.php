@@ -13,12 +13,12 @@ use Illuminate\Http\Request;
 |
 */
 
-/*Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});*/
-Route::get('messages/archive', 'MessageController@archive');
-Route::post('messages/{id}/read', 'MessageController@read');
-Route::post('messages/{id}/archive', 'MessageController@archived');
-Route::resource('messages', 'MessageController', [
-	'only' => ['index', 'show'],
-]);
+Route::group(['middleware' => ['auth.basic']], function()
+{
+	Route::get('messages/archive', 'MessageController@archive');
+	Route::post('messages/{id}/read', 'MessageController@read');
+	Route::post('messages/{id}/archive', 'MessageController@archived');
+	Route::resource('messages', 'MessageController', [
+		'only' => ['index', 'show'],
+	]);
+});
