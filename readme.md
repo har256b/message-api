@@ -26,5 +26,4 @@ API is tiny and slim with only one resource (messages), following are the endpoi
 
 API is protected with Basic HTTP Authentication. Users for basic auth are:
 
-- `oberlo/oberlo`
 - `har256b/har256b`
